@@ -10,6 +10,14 @@ class ProductRepository {
   ProductRepository({required this.apiService});
 
 
+  Future<ApiResponse> createProduct(Map<String, dynamic> body) async {
+    const apiURL = '${ConstantApi.baseURL}/products/';
+    
+    return apiService.createProduct(apiURL, body: body);
+    
+  }
+
+
   Future<ApiResponse<List<Product>>> fetchAllProducts(/*String token*/) async {
     const apiURL = '${ConstantApi.baseURL}/products/';
     

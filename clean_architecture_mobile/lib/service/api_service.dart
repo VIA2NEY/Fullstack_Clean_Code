@@ -9,6 +9,40 @@ class ApiService {
   
   
 
+
+  
+  Future<ApiResponse> createProduct(String url,{required Map<String, dynamic> body}) async {
+
+    try {
+      final uri = Uri.parse(url);
+      final headers = ApiHeaders.getHeaders();
+      final String encodedBody = jsonEncode(body);
+      final response = await http.post(
+        uri,
+        headers: headers,
+        body: encodedBody,
+      );
+
+        final  Map<String, dynamic> data = jsonDecode(response.body);
+        final code = response.statusCode;
+        final message = data['message'];
+
+        print('code : $code');
+        print('message : $message');
+
+        print('data : $data');
+
+        print(
+          "The response.body receive is ${response.body}"
+        );
+
+        return  ApiResponse(code: code, message: message, data: data['data']);
+
+    } catch (e) {
+      return ApiResponse(code: 416, message: e.toString());
+    }
+  }
+
   Future<ApiResponse<List<Product>>> fetchAllProducts(
     String url/*,
     {required String token}*/

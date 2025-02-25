@@ -9,6 +9,10 @@ class ProductController {
     required this.productRepository
   });
   
+  Future<ApiResponse> createProduct( Map<String, dynamic> body) async {
+    return productRepository.createProduct(body);
+  }
+  
   Future<ApiResponse<List<Product>>> fetchAllProducts(/*String token*/) async {
     return productRepository.fetchAllProducts(/*token*/);
   }

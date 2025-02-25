@@ -115,17 +115,44 @@ class _ProductScreenState extends State<ProductScreen> {
       "price": double.tryParse(enteredPrice.text)
     };
 
-    print("The body send is $body");
     
-      
-      Navigator.of(context).pop(
-        Product(
-          id: 5, 
-          name: enteredName.text,
-          description: enteredDescription.text,
-          price: double.tryParse(enteredPrice.text),
-        )
+
+    try {
+      final response = await _productController.createProduct(
+        body
       );
+
+      if (response.code == 200) {
+        
+        _showError(
+          "Produit ajouté avec succès!",
+          style: Theme.of(context).textTheme.displayMedium,
+          backgroundColor: const Color(0xFF05B10A),
+        );
+
+        Future.delayed(const Duration(seconds: 4));
+
+        Navigator.of(context).pop(
+          Product(
+            id: 5, 
+            name: enteredName.text,
+            description: enteredDescription.text,
+            price: double.tryParse(enteredPrice.text),
+          )
+        );
+
+      } else {
+
+        _showError(response.message);
+        
+      }
+
+    } catch (e) {
+      _showError(
+        "Exception : $e",
+        backgroundColor: Colors.red,
+      );
+    }
 
   }
 
