@@ -18,12 +18,12 @@ class ProductRepository {
   }
   
 
-//   Future<ApiResponse<Product>> fetchProductDetails(String token, String id) async {
-//     final apiURL = '${ConstantApi.baseURL}/products/$id';
+  Future<ApiResponse<Product>> fetchProductDetails(/*String token,*/ int id) async {
+    final apiURL = '${ConstantApi.baseURL}/products/$id';
     
-//     return apiService.fetchAllProducts(apiURL, token: token);
+    return apiService.fetchProductsDetails(apiURL/*, token: token*/);
     
-//   }
+  }
   
 
 }

@@ -13,8 +13,42 @@ class ApiService {
     String url/*,
     {required String token}*/
     ) async {
+      final uri = Uri.parse(url);
+      // final headers = ApiHeaders.getHeadersWithToken(token);
+      final headers = ApiHeaders.getHeaders();
+
+      final response = await http.get(uri, headers: headers);
+      final dataDecoded = json.decode(response.body);
+      
+      if (response.statusCode == 200) {
+        try {
+        List<Product> products = (dataDecoded['data'] as List)
+            .map((item) => Product.fromMap(item))
+            .toList();
+        return ApiResponse<List<Product>>(
+          code: dataDecoded['code'],
+          message: dataDecoded['message'],
+          data: products,
+        );
+      } catch (e) {
+        return ApiResponse<List<Product>>(
+          code: dataDecoded['code'] ?? 500,
+          message: 'Erreur lors de la conversion des données : $e',
+        );
+      }
+    } else {
+      // print("Erreur dans la structure de la réponse ou code HTTP invalide.");
+      return ApiResponse<List<Product>>(
+        code: dataDecoded['code'] ?? 500,
+        message: dataDecoded['message'] ?? 'Erreur inattendue',
+      );
+    }
+    
+  }
+  
+
+  Future<ApiResponse<Product>> fetchProductsDetails(String url) async {
     final uri = Uri.parse(url);
-    // final headers = ApiHeaders.getHeadersWithToken(token);
     final headers = ApiHeaders.getHeaders();
 
     final response = await http.get(uri, headers: headers);
@@ -22,29 +56,27 @@ class ApiService {
     
     if (response.statusCode == 200) {
       try {
-      List<Product> products = (dataDecoded['data'] as List)
-          .map((item) => Product.fromMap(item))
-          .toList();
-      return ApiResponse<List<Product>>(
-        code: dataDecoded['code'],
-        message: dataDecoded['message'],
-        data: products,
-      );
-    } catch (e) {
-      return ApiResponse<List<Product>>(
+        Product products = Product.fromMap(dataDecoded['data']);
+        return ApiResponse<Product>(
+          code: dataDecoded['code'],
+          message: dataDecoded['message'],
+          data: products,
+        );
+      } catch (e) {
+        return ApiResponse<Product>(
+          code: dataDecoded['code'] ?? 500,
+          message: 'Exception lors de la conversion des données : $e',
+        );
+      }
+    } else {
+      
+      return ApiResponse<Product>(
         code: dataDecoded['code'] ?? 500,
-        message: 'Erreur lors de la conversion des données : $e',
+        message: dataDecoded['message'] ?? 'Erreur inattendue',
       );
     }
-  } else {
-    // print("Erreur dans la structure de la réponse ou code HTTP invalide.");
-    return ApiResponse<List<Product>>(
-      code: dataDecoded['code'] ?? 500,
-      message: dataDecoded['message'] ?? 'Erreur inattendue',
-    );
+    
   }
-  
-}
 
 
 }

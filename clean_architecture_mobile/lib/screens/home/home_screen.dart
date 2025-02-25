@@ -25,10 +25,6 @@ class _HomeScreenState extends State<HomeScreen> {
   bool _isLoadedProduct = false;
 
 
-  // Others
-  String selectedMethod = 'cash';
-
-  
 
   Future<void> _loadAllProducts() async {
     setState(() {
@@ -104,68 +100,69 @@ class _HomeScreenState extends State<HomeScreen> {
       body: RefreshIndicator(
         onRefresh: _loaded,
         child: SafeArea(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-        
-              Skeletonizer(
-                enabled: _isLoadedProduct,
-                child: SizedBox(
-                  height: MediaQuery.of(context).size.height * 0.9,
-                  child: ListView.builder(
-                    itemCount: _productListModel.length,
-                    itemBuilder: (context, index){
-                      return Card(
-                        child: ListTile(
-                          leading: Icon(Icons.person),
-                          title: Text(
-                            _productListModel[index].name ?? 'N/A',
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          subtitle: Text(
-                            _productListModel[index].description ?? 'N/A',
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          trailing: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              IconButton(
-                                icon: Icon(Icons.edit) ,
-                                onPressed: () async {
-                                  
-                                  // Navigator.push(
-                                  //   context, 
-                                  //   MaterialPageRoute(builder: (context) => ModifierClient(getclient[index]) )
-                                  // ).then((data) {
-                                  //   if (data != null) {
-                                  //     getClient();// En gros c'est sa qui permet de reload automatiquement
-                                  //     showBoiteDialog("Succes", " Les details de "+ data.toString() +" ont été mis a jour avec succes");
-                                  //   } 
-                        
-                                  // });
-                        
-                                }
-                              ),
-                              IconButton(
-                                icon: Icon(Icons.delete) ,
-                                onPressed: () async{
-                                  // Client client = await ClientApi().suprimClientById(getclient[index].idClt!); /*nulcheck a cause de erreur a rgler la ou jai mis les we en null la */
-                        
-                                  // getClient();
-                                  // showBoiteDialog("Succes", " Les details de "+ client.toString() +" on été suprimer avec succés avec succes");
-                                }
-                              )
-                            ],
-                          ),
-                        )
-                      );
-                    },
-                  ),
+          child: SingleChildScrollView(
+            child: Skeletonizer(
+              enabled: _isLoadedProduct,
+              child: SizedBox(
+                height: MediaQuery.of(context).size.height * 0.9,
+                child: ListView.builder(
+                  itemCount: _productListModel.length,
+                  itemBuilder: (context, index){
+                    return Card(
+                      child: ListTile(
+                        leading: Icon(Icons.person),
+                        title: Text(
+                          _productListModel[index].name ?? 'N/A',
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        subtitle: Text(
+                          _productListModel[index].description ?? 'N/A',
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            IconButton(
+                              icon: Icon(Icons.edit) ,
+                              onPressed: () async {
+                                
+                                Navigator.push(
+                                  context, 
+                                  MaterialPageRoute(
+                                    builder: (context) => ProductScreen(
+                                      isCreate: false,
+                                      idProduct: _productListModel[index].id,
+                                    ) 
+                                  )
+                                ).then((data) {
+                                  if (data != null) {
+                                    _loaded();
+                                    // showBoiteDialog("Succes", " Les details de "+ data.toString() +" ont été mis a jour avec succes");
+                                  } 
+                      
+                                });
+                      
+                              }
+                            ),
+                            IconButton(
+                              icon: Icon(Icons.delete) ,
+                              onPressed: () async{
+                                // Client client = await ClientApi().suprimClientById(getclient[index].idClt!); /*nulcheck a cause de erreur a rgler la ou jai mis les we en null la */
+                      
+                                // getClient();
+                                // showBoiteDialog("Succes", " Les details de "+ client.toString() +" on été suprimer avec succés avec succes");
+                              }
+                            )
+                          ],
+                        ),
+                      )
+                    );
+                  },
                 ),
               ),
-            ],
+            ),
           ),
         ),
       ),

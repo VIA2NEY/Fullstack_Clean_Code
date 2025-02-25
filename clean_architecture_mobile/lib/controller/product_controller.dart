@@ -13,7 +13,7 @@ class ProductController {
     return productRepository.fetchAllProducts(/*token*/);
   }
   
-  // Future<ApiResponse<List<Product>>> fetchProductDetails(String token) async {
-  //   return productRepository.fetchProductDetails(token);
-  // }
+  Future<ApiResponse<Product>> fetchProductDetails(/*String token,*/ int id) async {
+    return productRepository.fetchProductDetails(id);
+  }
 }
