@@ -20,4 +20,13 @@ class ProductController {
   Future<ApiResponse<Product>> fetchProductDetails(/*String token,*/ int id) async {
     return productRepository.fetchProductDetails(id);
   }
+
+  Future<ApiResponse> updateProduct(int id, Map<String, dynamic> body) async {
+  return await productRepository.updateProduct(id, body);
+}
+
+Future<ApiResponse> deleteProduct(int id) async {
+  return await productRepository.deleteProduct(id);
+}
+
 }

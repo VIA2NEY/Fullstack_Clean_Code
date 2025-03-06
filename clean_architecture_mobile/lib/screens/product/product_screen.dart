@@ -126,20 +126,13 @@ class _ProductScreenState extends State<ProductScreen> {
         
         _showError(
           "Produit ajouté avec succès!",
-          style: Theme.of(context).textTheme.displayMedium,
+          style: Theme.of(context).textTheme.bodyLarge!.copyWith(color: Colors.white),
           backgroundColor: const Color(0xFF05B10A),
         );
 
         Future.delayed(const Duration(seconds: 4));
 
-        Navigator.of(context).pop(
-          Product(
-            id: 5, 
-            name: enteredName.text,
-            description: enteredDescription.text,
-            price: double.tryParse(enteredPrice.text),
-          )
-        );
+        Navigator.of(context).pop(response.data!);
 
       } else {
 
@@ -158,8 +151,7 @@ class _ProductScreenState extends State<ProductScreen> {
 
 
 
-  Future<void>_modif() async{
-
+  Future<void> _updateProduct() async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
       setState(() {
@@ -167,26 +159,35 @@ class _ProductScreenState extends State<ProductScreen> {
       });
     }
 
-    final body ={
-      "id": widget.idProduct,
-      "name":enteredName.text,
+    final body = {
+      "name": enteredName.text,
       "description": enteredDescription.text,
-      "price": double.tryParse(enteredPrice.text)
+      "price": double.tryParse(enteredPrice.text),
     };
 
-    print("The body send is $body");
-    
-      
-      Navigator.of(context).pop(
-        Product(
-          id: widget.idProduct, 
-          name: enteredName.text,
-          description: enteredDescription.text,
-          price: double.tryParse(enteredPrice.text),
-        )
-      );
+    try {
+      final response = await _productController.updateProduct(widget.idProduct!, body);
 
+      if (response.code == 200) {
+        _showError(
+          "Produit modifié avec succès!",
+          style: Theme.of(context).textTheme.bodyMedium!.copyWith(color: Colors.white),
+          backgroundColor: const Color(0xFF05B10A),
+        );
+        Future.delayed(const Duration(seconds: 2));
+        Navigator.of(context).pop(response.data!);
+      } else {
+        _showError(response.message, backgroundColor: Colors.redAccent, timeDuration: 6);
+      }
+    } catch (e) {
+      _showError(
+        "Exception : $e",
+        backgroundColor: Colors.red,
+        timeDuration: 6
+      );
+    }
   }
+
   
   
   void _showError(String errorMessage, {Color? backgroundColor, TextStyle? style, int? timeDuration}) {
@@ -338,7 +339,7 @@ class _ProductScreenState extends State<ProductScreen> {
                           )
                         :
                           ElevatedButton(
-                            onPressed: _sended ? null : _modif,
+                            onPressed: _sended ? null : _updateProduct,
                             child: _sended ? 
                               const SizedBox(height: 16, width: 16, child: CupertinoActivityIndicator(),) 
                             : const Text("Modifier")
