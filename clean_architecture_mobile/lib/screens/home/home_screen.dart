@@ -59,6 +59,83 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  Future<void> _deleteProduct(int idProduct) async {
+    bool confirm = await showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text("Confirmer la suppression"),
+        content: const Text("Voulez-vous vraiment supprimer ce produit ?"),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: Text(
+              "Annuler",
+              style: Theme.of(context).textTheme.bodyLarge,
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            child: Text(
+              "Supprimer",
+              style: Theme.of(context).textTheme.bodyLarge!.copyWith(color: Colors.white),
+            ),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm == true) {
+      setState(() {
+        _isLoadedProduct = true;
+      });
+
+      try {
+        final response = await _productController.deleteProduct(idProduct);
+
+        if (response.code == 200) {
+          _showError(
+            "Produit supprimé avec succès!",
+            timeDuration: 5,
+            backgroundColor: Colors.green,
+          );
+          _loaded();
+        } else {
+          _showError(
+            response.message,
+            timeDuration: 8
+          );
+        }
+      } catch (e) {
+        _showError(
+          "Exception : $e",
+          backgroundColor: Colors.red,
+          timeDuration: 8
+        );
+      }
+
+      setState(() {
+        _isLoadedProduct = false;
+      });
+    }
+  }
+  
+
+  void _showError(String errorMessage, {Color? backgroundColor, TextStyle? style, int? timeDuration}) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        backgroundColor: backgroundColor ?? Theme.of(context).colorScheme.primary,
+        content: Text(
+          errorMessage,
+          style: style ?? Theme.of(context).textTheme.bodyMedium!.copyWith(
+            color: Colors.white
+          ),
+        ),
+        duration: Duration(seconds: timeDuration ?? 4),
+      ),
+    );
+  }
+
   Future<void> _loaded() async{
     // Models
     _productListModel = [];
@@ -149,10 +226,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             IconButton(
                               icon: Icon(Icons.delete) ,
                               onPressed: () async{
-                                // Client client = await ClientApi().suprimClientById(getclient[index].idClt!); /*nulcheck a cause de erreur a rgler la ou jai mis les we en null la */
-                      
-                                // getClient();
-                                // showBoiteDialog("Succes", " Les details de "+ client.toString() +" on été suprimer avec succés avec succes");
+                                _deleteProduct(_productListModel[index].id!);
                               }
                             )
                           ],
@@ -177,7 +251,11 @@ class _HomeScreenState extends State<HomeScreen> {
                 );
               }
             )
-          );
+          ).then((data) {
+            if (data != null) {
+              _loaded();
+            } 
+          });
         },
         tooltip: 'Ajouter',
         child: const Icon(Icons.add),

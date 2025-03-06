@@ -33,5 +33,14 @@ class ProductRepository {
     
   }
   
+  Future<ApiResponse> updateProduct(int id, Map<String, dynamic> body) async {
+    final apiURL = '${ConstantApi.baseURL}/products/$id';
+    return apiService.updateProduct(apiURL, body: body);
+  }
+
+  Future<ApiResponse> deleteProduct(int id) async {
+    final apiURL = '${ConstantApi.baseURL}/products/$id';
+    return apiService.deleteProduct(apiURL);
+  }
 
 }
